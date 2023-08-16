@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import 'dotenv/config';
+import { ObjectId } from "mongodb";
 
 const dbAddress = process.env.MONGO_CONN_STR;
 
@@ -40,6 +41,12 @@ const findExcercise = async (filter) => {
     return query.exec();
 }
 
+const findExcerciseById = async (id) => {
+    console.log(id);
+    const query = exercise.find({_id : String(id)});
+    return query.exec();
+}
+
 const updateExcercise = async (filter, update) => {
     const result = await exercise.updateOne(filter, update);
     return result;
@@ -53,4 +60,4 @@ const deleteExcercise = async (filter) => {
     else 
         return true;
 }
-export {createExcercise, findExcercise, updateExcercise, deleteExcercise};
+export {createExcercise, findExcercise, updateExcercise, deleteExcercise, findExcerciseById};

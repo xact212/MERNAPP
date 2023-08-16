@@ -23,15 +23,28 @@ app.get('/exercises', asyncHandler(async (req, res) => {
 
 app.get('/exercises/:_id', asyncHandler(async (req, res) => {
     console.log("get excercise by id");
-    let id = req.params._id;
-    const excerciseArr = await database.findExcercise({_id : id});
+    let excerciseArr = 'undefined';
+    try {
+        excerciseArr = await database.findExcerciseById(req.params._id);
+    }
+    catch (err) {
+        console.log(err);
+        res.set({
+            'status' : '404',
+            'Content-Type' : 'application/json'
+        });
+        res.send([]);
+        return;
+    }
     if (excerciseArr === 'undefined') {
         res.set({
             'status' : '404',
             'Content-Type' : 'application/json'
         });
-        res.send({Error : "Item not found"});
+        res.send([]);
+        return;
     }
+    console.log("hello");
     res.set({
         'status' : '200',
         'Content-Type' : 'application/json'
@@ -86,7 +99,9 @@ app.put('/exercises/:_id', asyncHandler(async (req, res) => {
     const repsIsValid = (req.body.reps !== 'undefined' && req.body.reps > 0);  
     const weightIsValid = (req.body.weight !== 'undefined' && req.body.weight > 0);  
     const unitIsValid = (req.body.unit === 'kgs' || req.body.unit === 'lbs');
-    const dateIsValid = () => {
+    console.log(req.body.date);
+    function dateIsValid () {
+        console.log("checking if date is valid");
         if (req.body.date === 'undefined' || req.body.date === null || req.body.date === '' || req.body.date.length !== 8)
             return false;
         else {
@@ -101,10 +116,12 @@ app.put('/exercises/:_id', asyncHandler(async (req, res) => {
             const year = req.body.date.slice(6, 8);     
             if (parseInt(year) === NaN || parseInt(year) > 99 || parseInt(year) < 1)
                 return false;
+            console.log(`date ${req.body.date} is valid!`);
             return true;
         }
     }
-    if (!(nameIsValid && repsIsValid && weightIsValid && unitIsValid && dateIsValid)) {
+    if (!nameIsValid || !repsIsValid || !weightIsValid || !unitIsValid || !dateIsValid()) {
+        console.log(`date ${req.body.date} is invalid!`);
         res.set({
             'status' : '400', 
             'Content-Type' : 'application/json'
