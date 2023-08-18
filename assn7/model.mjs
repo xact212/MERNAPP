@@ -42,8 +42,7 @@ const findExcercise = async (filter) => {
 }
 
 const findExcerciseById = async (id) => {
-    console.log(id);
-    const query = exercise.find({_id : String(id)});
+    const query = exercise.findById(id);
     return query.exec();
 }
 
